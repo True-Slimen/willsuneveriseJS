@@ -3,7 +3,7 @@
 
 <template>
   <div class="nav bg-zinc-900">
-    <h1 class="text-stone-400">Will Sun Ever Rise ?</h1>
+    <h1 class="block text-center text-stone-400">Will Sun Ever Rise ?</h1>
   </div>
 </template>
 
