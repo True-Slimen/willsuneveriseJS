@@ -2,17 +2,19 @@
 </script>
 
 <template>
-  <div class="nav">
-    <h1>Will Sun Ever Rise ?</h1>
+  <div class="nav bg-zinc-900">
+    <h1 class="text-stone-400">Will Sun Ever Rise ?</h1>
   </div>
 </template>
 
 <style>
 .nav {
-background-color: #1a1a1a;
+  position: relative;
+  z-index: 20;
 }
 
 h1 {
+  font-family: BrokenDetroit, sans-serif;
   font-size: 28px;
   padding: 10px 0;
   margin: 0;

@@ -1,0 +1,74 @@
+@font-face {
+    font-family: 'BrokenDetroit';
+    src: url('../fonts/Broken-Detroit.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'fontello';
+    src: url('../icons/fontello-fd740071/font/fontello.eot?928807');
+    src: url('../icons/fontello-fd740071/font/fontello.eot?928807#iefix') format('embedded-opentype'),
+    url('../icons/fontello-fd740071/font/fontello.woff?928807') format('woff'),
+    url('../icons/fontello-fd740071/font/fontello.ttf?928807') format('truetype'),
+    url('../icons/fontello-fd740071/font/fontello.svg?928807#fontello') format('svg');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.icon-world:before { content: '\e800'; } /* '' */
+.icon-cog:before { content: '\e801'; } /* '' */
+.icon-wrench:before { content: '\e802'; } /* '' */
+.icon-trophy:before { content: '\e803'; } /* '' */
+.icon-warning:before { content: '\e804'; } /* '' */
+.icon-pause:before { content: '\e805'; } /* '' */
+.icon-play:before { content: '\e806'; } /* '' */
+.icon-dollar:before { content: '\e807'; } /* '' */
+.icon-chat:before { content: '\e808'; } /* '' */
+.icon-hammer:before { content: '\e809'; } /* '' */
+.icon-bell:before { content: '\e80a'; } /* '' */
+.icon-water:before { content: '\e80b'; } /* '' */
+.icon-heart:before { content: '\e80c'; } /* '' */
+.icon-hospital:before { content: '\e821'; } /* '' */
+.icon-school:before { content: '\e834'; } /* '' */
+.icon-resize-full:before { content: '\f0b2'; } /* '' */
+.icon-food:before { content: '\f0f5'; } /* '' */
+.icon-child:before { content: '\f1ae'; } /* '' */
+.icon-slide:before { content: '\f1de'; } /* '' */
+.icon-hourglass:before { content: '\f252'; } /* '' */
+.icon-map:before { content: '\f279'; } /* '' */
+
+.icon {
+    font-family: "fontello", serif;
+    font-style: normal;
+    font-weight: normal;
+    speak: never;
+    display: inline-block;
+    text-decoration: inherit;
+    width: 1em;
+    margin-right: .2em;
+    text-align: center;
+    /* opacity: .8; */
+
+    /* For safety - reset parent styles, that can break glyph codes*/
+    font-variant: normal;
+    text-transform: none;
+
+    /* fix buttons height, for twitter bootstrap */
+    line-height: 1em;
+
+    /* Animation center compensation - margins should be symmetric */
+    /* remove if not needed */
+    margin-left: .2em;
+
+    /* You can be more comfortable with increased icons size */
+    /* font-size: 120%; */
+
+    /* Font smoothing. That was taken from TWBS */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    /* Uncomment for 3D effect */
+    /* text-shadow: 1px 1px 1px rgba(127, 127, 127, 0.3); */
+}

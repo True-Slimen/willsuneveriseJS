@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@import './fonts.css';
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 100%;
+  min-height: 100vh;
+}
+
+#app {
+  width: 100%;
+  min-height: 700px;
+  height: 100dvh;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+}
+
+button:hover {
+  cursor: pointer;
+}
+
+button {
+  position: relative;
+  transition: all 0.1s ease;
+  overflow: hidden;
+}
+
+button:before {
+  content: "";
+  z-index: 0;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(130deg,rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 33%, rgba(0, 0, 0, 0) 66%, rgba(0, 0, 0, 0.5) 100%);
+  opacity: 0.5;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  transform: translate(-50%, -50%);
+  transition: all 0.15s ease;
+}
+
+button:hover:before {
+  transform: translate(0%, -50%);
+  background: linear-gradient(130deg,rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.8) 33%, rgba(0, 0, 0, 0) 66%, rgba(0, 0, 0, 0.5) 100%);
+  transition: all 0.15s ease;
+}
+
+button:active {
+  transition: all 0.1s ease;
+  scale: 0.96;
+}
