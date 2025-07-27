@@ -37,7 +37,7 @@ function select(index) {
       </li>
     </ul>
     <div class="content">
-      <WorldGenerator v-if="selectedLinks?.components === 'world'"></WorldGenerator>
+      <WorldGenerator class="world-generator" v-if="selectedLinks?.components === 'world'"></WorldGenerator>
     </div>
   </div>
 </template>
@@ -84,5 +84,13 @@ function select(index) {
 .content {
   height: 100%;
   width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+}
+
+.world-generator {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 </style>

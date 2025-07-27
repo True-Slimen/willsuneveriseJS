@@ -6,4 +6,6 @@ export interface ParamsNoise {
   seed: number,
   x: number,
   y: number,
+  invert?: boolean,
+  threshold?: number,
 }

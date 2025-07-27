@@ -23,14 +23,15 @@ export function generateNoiseMap(width: number, height: number, params: ParamsNo
 
         maxValue += amplitude
         amplitude *= params.amplitude         // ou persistence, les deux noms sont utilisés
-        console.log('===== ampl : ', amplitude)
         frequency *= params.persistence       // inversement aussi parfois
-        console.log('===== freq : ', frequency)
-
       }
 
-      // Normalise entre 0 et 1
-      row.push((noiseValue / maxValue + 1) / 2)
+      let normalized = (noiseValue / maxValue + 1) / 2
+      if (params.invert) {
+        normalized = 1 - normalized
+      }
+      row.push(normalized)
+
     }
 
     map.push(row)

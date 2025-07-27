@@ -91,7 +91,7 @@ const gridStyle = computed(() => ({
           :class="[
           tile.type.toLowerCase(),
           tile.support !== 'none' ? tile.support.toLowerCase() : '',
-          { inaccessible: !tile.accessible }
+          { walkable: !tile.walkable }
         ]"
       />
     </div>
@@ -107,11 +107,11 @@ const gridStyle = computed(() => ({
 }
 .tile.dirt { background-color: #a17351; }
 .tile.sand { background-color: #e0c28d; }
-.tile.water { background-color: #4a90e2; }
+.tile.water { background-color: #1d5525; }
 
 .tile.tree { background-color: #164a0c; }
 .tile.wall { background-color: #555; }
 .tile.building { background-color: #734343; }
 
-.tile.inaccessible { opacity: 0.5; }
+.tile.walkable { opacity: 0.5; }
 </style>
