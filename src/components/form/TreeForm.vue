@@ -13,17 +13,17 @@ const paramsNoise = defineModel<ParamsNoise>({ required: true })
 
     <div class="input-group">
       <label for="octave" class="block text-sm font-medium text-slate-400">Amplitude : {{paramsNoise.amplitude}}</label>
-      <input id="octave" type="range" min="0.01" max="1" step="0.01" v-model="paramsNoise.amplitude" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+      <input id="octave" type="range" min="0.001" max="1" step="0.001" v-model="paramsNoise.amplitude" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
     </div>
 
     <div class="input-group">
       <label for="octave" class="block text-sm font-medium text-slate-400">Persistence : {{paramsNoise.persistence}}</label>
-      <input id="octave" type="range" min="0.1" max="1" step="0.1" v-model="paramsNoise.persistence" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+      <input id="octave" type="range" min="0.1" max="20" step="0.1" v-model="paramsNoise.persistence" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
     </div>
 
     <div class="input-group">
       <label for="octave" class="block text-sm font-medium text-slate-400">Scale : {{paramsNoise.scale}}</label>
-      <input id="octave" type="range" min="0.01" max="1" step="0.01" v-model="paramsNoise.scale" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+      <input id="octave" type="range" min="0.005" max="0.1" step="0.001" v-model="paramsNoise.scale" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
     </div>
 
     <div class="input-group">

@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {gridBaseGenerator} from "@/game/procedural/gridBaseGenerator.ts";
 import {useMapStore} from "@/stores/mapStore.ts";
-import type {ParamsNoise} from "@/game/types/noise.ts";
+import type {ParamsNoise, ParamsNoiseCollection} from "@/game/types/noise.ts";
 import {reactive, watch} from "vue";
 import DirtForm from "@/components/form/DirtForm.vue";
 import WaterForm from "@/components/form/WaterForm.vue";
 import Collapse from "@/components/form/Collapse.vue";
+import TreeForm from "@/components/form/TreeForm.vue";
 
 const mapStore = useMapStore()
 
@@ -19,6 +20,7 @@ const paramsDirtNoise: ParamsNoise = reactive({
   y: 0,
   invert: false,
   threshold: 0.7,
+  active: true
 })
 
 const paramsWaterNoise: ParamsNoise = reactive({
@@ -31,16 +33,31 @@ const paramsWaterNoise: ParamsNoise = reactive({
   y: 0,
   invert: false,
   threshold: 0.8,
+  active: true
 })
 
-const paramsCollection = reactive({
+const paramsTreeNoise: ParamsNoise = reactive({
+  octaveCount: 4,
+  amplitude: 0.85,
+  persistence: 10.1,
+  scale: 0.06,
+  seed: 218,
+  x: 0,
+  y: 0,
+  invert: false,
+  threshold: 0.6,
+  active: true
+})
+
+const paramsCollection: ParamsNoiseCollection = reactive({
   dirt: paramsDirtNoise,
   water: paramsWaterNoise,
+  tree: paramsTreeNoise,
 })
 
 watch(paramsCollection, async () => {
   createMap()
-},{ deep: true })
+})
 
 function createMap() {
   const newGrid = gridBaseGenerator(95, 65, paramsCollection)
@@ -50,11 +67,14 @@ function createMap() {
 
 <template>
   <div class="px-3 d-flex gap-1">
-    <Collapse :title="'Terres fertiles'">
+    <Collapse class="relative" :title="'Terres fertiles'">
       <DirtForm v-model="paramsDirtNoise" />
     </Collapse>
-    <Collapse :title="'Étendues d\'eau'">
+    <Collapse class="relative" :title="'Étendues d\'eau'">
       <WaterForm v-model="paramsWaterNoise" />
+    </Collapse>
+    <Collapse class="relative" :title="'Fôret'">
+      <TreeForm v-model="paramsTreeNoise" />
     </Collapse>
     <button
         @click="createMap"
@@ -66,5 +86,8 @@ function createMap() {
 </template>
 
 <style lang="scss">
-
+.active-noise {
+  position: absolute;
+  top: 13px;
+}
 </style>

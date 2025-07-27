@@ -42,9 +42,7 @@ function clamp(value: number, min: number, max: number): number {
 }
 
 function onMouseDown(event: MouseEvent) {
-  console.log('heere')
   if (event.button !== 1) return // Seulement clic molette (bouton 1)
-  console.log('here 2')
   event.preventDefault()
   isPanning.value = true
   panStartX.value = event.clientX - translateX.value
@@ -107,11 +105,24 @@ const gridStyle = computed(() => ({
 }
 .tile.dirt { background-color: #a17351; }
 .tile.sand { background-color: #e0c28d; }
-.tile.water { background-color: #1d5525; }
+.tile.water { background-color: #1d5535; }
 
-.tile.tree { background-color: #164a0c; }
+.tile.tree { background-color: #9ea152; }
 .tile.wall { background-color: #555; }
 .tile.building { background-color: #734343; }
 
 .tile.walkable { opacity: 0.5; }
+
+.tile.has-tree::after {
+  content: "";
+  display: block;
+  width: 40%;
+  height: 40%;
+  background-color: #4cd137;
+  border-radius: 2px;
+  margin: auto;
+  position: relative;
+  top: 30%;
+  z-index: 1;
+}
 </style>

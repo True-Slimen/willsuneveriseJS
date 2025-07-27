@@ -8,4 +8,11 @@ export interface ParamsNoise {
   y: number,
   invert?: boolean,
   threshold?: number,
+  active: boolean
+}
+
+export interface ParamsNoiseCollection {
+  dirt: ParamsNoise,
+  water: ParamsNoise,
+  tree: ParamsNoise
 }

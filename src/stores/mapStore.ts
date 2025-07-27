@@ -4,7 +4,7 @@ import type {Tile} from '@/game/types/tile'
 import {unref} from "vue";
 
 export const useMapStore = defineStore('map', () => {
-  const gridBase = useStorage<Tile[][] | null>('gridBase', null)
+  const gridBase = useStorage<string | null>('gridBase', null)
 
   function setGridBase(grid: Tile[][]) {
     gridBase.value = JSON.stringify(unref(grid))

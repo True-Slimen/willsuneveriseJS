@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {ref, reactive} from "vue";
 import WorldGenerator from "@/components/tabs/WorldGenerator.vue";
+import type {MenuLinks} from "@/game/types/ui.ts";
 
-const menuLinks: string[] = reactive([
+const menuLinks = reactive<MenuLinks[]>([
   {
     icon: "icon-world",
     title: "Créer carte",
@@ -14,9 +15,12 @@ const menuLinks: string[] = reactive([
     components: "settings",
   },
 ])
-let selectedLinks: string | null = ref(null);
 
-function select(index) {
+const selectedLinks = ref<MenuLinks | null>(null)
+
+function select(index: number) {
+  if (!selectedLinks) return
+
   if(selectedLinks.value != menuLinks[index]) {
    return selectedLinks.value = menuLinks[index];
   }

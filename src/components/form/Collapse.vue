@@ -5,7 +5,7 @@ const props = defineProps({
   title: String,
 })
 
-let collapseState: boolean = ref(false);
+let collapseState = ref(false);
 </script>
 
 <template>

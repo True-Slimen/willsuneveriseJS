@@ -1,9 +1,11 @@
 <script setup lang="ts">
-const paramsNoise = defineModel()
+import type {ParamsNoise} from "@/game/types/noise.ts";
+const paramsNoise = defineModel<ParamsNoise>({ required: true })
 </script>
 
 <template>
   <div class="form-group">
+    <input type="checkbox" v-model="paramsNoise.active" class="active-noise">
     <div class="input-group">
       <label for="octave" class="block text-sm font-medium text-slate-400">Octave : {{paramsNoise.octaveCount}}</label>
       <input id="octave" type="range" min="0" max="7" v-model="paramsNoise.octaveCount" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
