@@ -5,7 +5,6 @@ import { generateNoiseMap} from "@/game/procedural/noiseMap.ts";
 
 
 export function applyDirtTiles(grid: Tile[][], paramsNoise: ParamsNoise): Tile[][] {
-  console.log("hello")
   const height = grid.length
   const width = grid[0].length
   const noiseMap = generateNoiseMap(width, height, paramsNoise)

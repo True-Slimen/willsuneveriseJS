@@ -11,8 +11,13 @@ export interface ParamsNoise {
   active: boolean
 }
 
+export interface ParamsBuildingNoise extends ParamsNoise{
+  minDistance: number
+}
+
 export interface ParamsNoiseCollection {
   dirt: ParamsNoise,
   water: ParamsNoise,
-  tree: ParamsNoise
+  tree: ParamsNoise,
+  building: ParamsBuildingNoise
 }

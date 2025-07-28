@@ -1,128 +1,133 @@
 <script setup lang="ts">
-import { computed, defineProps, ref } from 'vue'
-import type { Tile } from '@/game/types/tile'
+import {onMounted, ref, watch} from 'vue'
+import {type Tile, TileType} from '@/game/types/tile'
 
 const props = defineProps<{ grid: Tile[][] }>()
 
-const flatGrid = computed(() => {
-  if (!props.grid || !Array.isArray(props.grid)) return []
-  return props.grid.flat()
+const canvasRef = ref<HTMLCanvasElement | null>(null)
+const tileSize = 50
+
+function getTileColor(tile: Tile): string {
+  switch (tile.type) {
+    case TileType.Dirt: return '#bc9c73'
+    case TileType.Sand: return '#e0c28d'
+    case TileType.Water: return '#396a88'
+    default: return '#999'
+  }
+}
+
+function getSupportColor(support: string): string | null {
+  switch (support.toLowerCase()) {
+    case 'tree': return '#9ea152'
+    case 'wall': return '#555555'
+    case 'building': return '#734343'
+    case 'base': return '#40361d'
+    default: return null
+  }
+}
+
+// Fonction qui dessine le carré bleu autour du centre de base
+function drawBaseCenterMarker(ctx: CanvasRenderingContext2D, grid: Tile[][]) {
+  const height = grid.length
+  const width = grid[0]?.length || 0
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const tile = grid[y][x]
+      if (tile.isBaseCenter) {
+        ctx.save()
+        ctx.strokeStyle = '#40361d'
+        ctx.lineWidth = 9
+
+        const squareSize = tileSize * 2
+        const offset = tileSize * 0.5
+
+        ctx.strokeRect(
+            x * tileSize - offset,
+            y * tileSize - offset,
+            squareSize,
+            squareSize
+        )
+
+        ctx.restore()
+        return // Il ne peut y avoir qu’un seul centre
+      }
+    }
+  }
+}
+
+function drawGrid(ctx: CanvasRenderingContext2D, grid: Tile[][]) {
+  if (!grid.length) return
+  const width = grid[0].length
+  const height = grid.length
+
+  ctx.clearRect(0, 0, width * tileSize, height * tileSize)
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      const tile = grid[y][x]
+
+      // Sol
+      ctx.fillStyle = getTileColor(tile)
+      ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize)
+
+      // Bordure
+      ctx.strokeStyle = 'rgba(17,17,17,0.29)'
+      ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize)
+
+      // Support
+      if (tile.support && tile.support.toLowerCase() !== 'none') {
+        const supportColor = getSupportColor(tile.support)
+        if (supportColor) {
+          const padding = tileSize * 0.25
+          ctx.fillStyle = supportColor
+          ctx.fillRect(
+              x * tileSize + padding,
+              y * tileSize + padding,
+              tileSize - padding * 2,
+              tileSize - padding * 2
+          )
+        }
+      }
+    }
+  }
+
+  // Une fois tout dessiné, on trace le carré central si besoin
+  drawBaseCenterMarker(ctx, grid)
+}
+
+onMounted(() => {
+  const canvas = canvasRef.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
+  drawGrid(ctx, props.grid)
 })
-const zoomLevel = ref(0.2)
-const originX = ref('50%')
-const originY = ref('50%')
 
-// Pour gérer le déplacement
-const isPanning = ref(false)
-const panStartX = ref(0)
-const panStartY = ref(0)
-const translateX = ref(0)
-const translateY = ref(0)
+watch(() => props.grid, (newGrid) => {
+  const canvas = canvasRef.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
 
-function onWheel(event: WheelEvent) {
-  event.preventDefault()
-
-  const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
-
-  // Calcul du pourcentage de la souris relative à la div canvas-wrapper
-  const offsetX = event.clientX - rect.left
-  const offsetY = event.clientY - rect.top
-
-  originX.value = `${(offsetX / rect.width) * 100}%`
-  originY.value = `${(offsetY / rect.height) * 100}%`
-
-  const delta = -event.deltaY
-  const zoomChange = delta > 0 ? 0.1 : -0.1
-  const nextZoom = zoomLevel.value + zoomChange
-  zoomLevel.value = Math.min(5, Math.max(0.2, nextZoom)) // Zoom mini à 0.75
-}
-
-function clamp(value: number, min: number, max: number): number {
-  return Math.min(Math.max(value, min), max)
-}
-
-function onMouseDown(event: MouseEvent) {
-  if (event.button !== 1) return // Seulement clic molette (bouton 1)
-  event.preventDefault()
-  isPanning.value = true
-  panStartX.value = event.clientX - translateX.value
-  panStartY.value = event.clientY - translateY.value
-
-  // Pour capter le mousemove et mouseup partout sur la page
-  window.addEventListener('mousemove', onMouseMove)
-  window.addEventListener('mouseup', onMouseUp)
-}
-
-function onMouseMove(event: MouseEvent) {
-  if (!isPanning.value) return
-  translateX.value = clamp(event.clientX - panStartX.value, -150, 150)
-  translateY.value = clamp(event.clientY - panStartY.value, -150, 150)
-}
-
-function onMouseUp(event: MouseEvent) {
-  if (event.button !== 1) return
-  isPanning.value = false
-  window.removeEventListener('mousemove', onMouseMove)
-  window.removeEventListener('mouseup', onMouseUp)
-}
-
-
-const gridStyle = computed(() => ({
-  display: 'grid',
-  gridTemplateColumns: `repeat(${props.grid[0].length}, 50px)`,
-  gridTemplateRows: `repeat(${props.grid.length}, 50px)`,
-  transform: `translate(${translateX.value}px, ${translateY.value}px) scale(${zoomLevel.value})`,
-  transformOrigin: `${originX.value} ${originY.value}`,
-  cursor: isPanning.value ? 'grabbing' : 'default',
-}))
+  drawGrid(ctx, newGrid)
+}, { deep: true })
 </script>
 
 <template>
-  <div @wheel.prevent="onWheel" class="">
-    {{translateX}}
-    {{translateY}}
-    <div @mousedown="onMouseDown" class="grid" :style="gridStyle">
-      <div
-          v-for="tile in flatGrid"
-          :key="`${tile.x}-${tile.y}`"
-          class="tile"
-          :class="[
-          tile.type.toLowerCase(),
-          tile.support !== 'none' ? tile.support.toLowerCase() : '',
-          { walkable: !tile.walkable }
-        ]"
-      />
-    </div>
-  </div>
+  <canvas
+      ref="canvasRef"
+      :width="props.grid[0]?.length * tileSize"
+      :height="props.grid.length * tileSize"
+      style="border: 1px solid black;"
+  />
 </template>
 
-<style scoped>
-.tile {
-  width: 50px;
-  height: 50px;
-  box-sizing: border-box;
-  border: 1px solid rgba(17, 17, 17, 0.29);
-}
-.tile.dirt { background-color: #a17351; }
-.tile.sand { background-color: #e0c28d; }
-.tile.water { background-color: #1d5535; }
-
-.tile.tree { background-color: #9ea152; }
-.tile.wall { background-color: #555; }
-.tile.building { background-color: #734343; }
-
-.tile.walkable { opacity: 0.5; }
-
-.tile.has-tree::after {
-  content: "";
-  display: block;
-  width: 40%;
-  height: 40%;
-  background-color: #4cd137;
-  border-radius: 2px;
-  margin: auto;
-  position: relative;
-  top: 30%;
-  z-index: 1;
+<style>
+canvas {
+  margin-top: 50px;
+  width: 1300px;
+  height: 800px;
 }
 </style>

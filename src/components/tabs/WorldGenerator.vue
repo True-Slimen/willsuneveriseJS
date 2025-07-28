@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import {gridBaseGenerator} from "@/game/procedural/gridBaseGenerator.ts";
 import {useMapStore} from "@/stores/mapStore.ts";
-import type {ParamsNoise, ParamsNoiseCollection} from "@/game/types/noise.ts";
+import type {ParamsBuildingNoise, ParamsNoise, ParamsNoiseCollection} from "@/game/types/noise.ts";
 import {reactive, watch} from "vue";
 import DirtForm from "@/components/form/DirtForm.vue";
 import WaterForm from "@/components/form/WaterForm.vue";
 import Collapse from "@/components/form/Collapse.vue";
 import TreeForm from "@/components/form/TreeForm.vue";
+import BuildingForm from "@/components/form/BuildingForm.vue";
 
 const mapStore = useMapStore()
 
@@ -49,10 +50,25 @@ const paramsTreeNoise: ParamsNoise = reactive({
   active: true
 })
 
+const paramsBuildingNoise: ParamsBuildingNoise = reactive({
+  octaveCount: 6,
+  amplitude: 0.359,
+  persistence: 11.9,
+  scale: 0.08,
+  seed: 265,
+  x: 8,
+  y: -2,
+  invert: false,
+  threshold: 0.6,
+  active: true,
+  minDistance: 22,
+})
+
 const paramsCollection: ParamsNoiseCollection = reactive({
   dirt: paramsDirtNoise,
   water: paramsWaterNoise,
   tree: paramsTreeNoise,
+  building: paramsBuildingNoise,
 })
 
 watch(paramsCollection, async () => {
@@ -75,6 +91,9 @@ function createMap() {
     </Collapse>
     <Collapse class="relative" :title="'Fôret'">
       <TreeForm v-model="paramsTreeNoise" />
+    </Collapse>
+    <Collapse class="relative" :title="'Bâtiments'">
+      <BuildingForm v-model="paramsBuildingNoise" />
     </Collapse>
     <button
         @click="createMap"
