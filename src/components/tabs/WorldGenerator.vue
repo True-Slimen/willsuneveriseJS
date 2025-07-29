@@ -76,7 +76,7 @@ watch(paramsCollection, async () => {
 })
 
 function createMap() {
-  const newGrid = gridBaseGenerator(95, 65, paramsCollection)
+  const newGrid = gridBaseGenerator(86, 53, paramsCollection)
   mapStore.setGridBase(newGrid)
 }
 </script>

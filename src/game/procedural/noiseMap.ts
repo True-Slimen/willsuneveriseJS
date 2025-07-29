@@ -4,7 +4,7 @@ import type { ParamsNoise } from '@/game/types/noise'
 export function generateNoiseMap(width: number, height: number, params: ParamsNoise): number[][] {
   const noise2D = makeNoise2D(params.seed)
   const map: number[][] = []
-
+  console.log('height ', height)
   for (let y = 0; y < height; y++) {
     const row: number[] = []
 
