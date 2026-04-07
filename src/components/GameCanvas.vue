@@ -1,11 +1,68 @@
 <script setup lang="ts">
-import {onMounted, ref, watch} from 'vue'
+import {onMounted, onUnmounted, ref, watch} from 'vue'
 import {type Tile, TileSupport, TileType} from '@/game/types/tile'
 
 const props = defineProps<{ grid: Tile[][] }>()
 
 const canvasRef = ref<HTMLCanvasElement | null>(null)
 const tileSize = 30
+
+// Zoom & pan state
+const scale = ref(1)
+const offsetX = ref(0)
+const offsetY = ref(0)
+const isPanning = ref(false)
+const panStart = { x: 0, y: 0 }
+
+function onWheel(event: WheelEvent) {
+  event.preventDefault()
+  const canvas = canvasRef.value
+  if (!canvas) return
+
+  const rect = canvas.getBoundingClientRect()
+  const mouseX = event.clientX - rect.left
+  const mouseY = event.clientY - rect.top
+
+  // Zoom centré sur le curseur
+  const zoomFactor = event.deltaY < 0 ? 1.1 : 0.9
+  const newScale = Math.min(4, Math.max(0.2, scale.value * zoomFactor))
+
+  // Ajuster l'offset pour que le point sous le curseur reste fixe
+  offsetX.value = mouseX - (mouseX - offsetX.value) * (newScale / scale.value)
+  offsetY.value = mouseY - (mouseY - offsetY.value) * (newScale / scale.value)
+  scale.value = newScale
+
+  redraw()
+}
+
+function onMouseDown(event: MouseEvent) {
+  if (event.button !== 1) return // Clic molette uniquement
+  event.preventDefault()
+  isPanning.value = true
+  panStart.x = event.clientX - offsetX.value
+  panStart.y = event.clientY - offsetY.value
+  window.addEventListener('mousemove', onMouseMove)
+  window.addEventListener('mouseup', onMouseUp)
+}
+
+function onMouseMove(event: MouseEvent) {
+  if (!isPanning.value) return
+  offsetX.value = event.clientX - panStart.x
+  offsetY.value = event.clientY - panStart.y
+  redraw()
+}
+
+function onMouseUp(event: MouseEvent) {
+  if (event.button !== 1) return
+  isPanning.value = false
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', onMouseUp)
+}
+
+onUnmounted(() => {
+  window.removeEventListener('mousemove', onMouseMove)
+  window.removeEventListener('mouseup', onMouseUp)
+})
 
 function getTileColor(tile: Tile): string {
   switch (tile.type) {
@@ -82,12 +139,30 @@ const treeImage = new Image();
 import treePng from '@/assets/images/tree-1.png'
 treeImage.src = treePng;
 
+function redraw() {
+  const canvas = canvasRef.value
+  if (!canvas) return
+  const ctx = canvas.getContext('2d')
+  if (!ctx) return
+  drawGrid(ctx, props.grid)
+}
+
 function drawGrid(ctx: CanvasRenderingContext2D, grid: Tile[][]) {
   if (!grid.length) return
+  const canvas = ctx.canvas
+
+  // Clear en espace écran (ignore le transform)
+  ctx.save()
+  ctx.setTransform(1, 0, 0, 1, 0, 0)
+  ctx.clearRect(0, 0, canvas.width, canvas.height)
+  ctx.restore()
+
+  // Appliquer le transform zoom/pan
+  ctx.save()
+  ctx.setTransform(scale.value, 0, 0, scale.value, offsetX.value, offsetY.value)
+
   const width = grid[0].length
   const height = grid.length
-
-  ctx.clearRect(0, 0, width * tileSize, height * tileSize)
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
@@ -111,7 +186,6 @@ function drawGrid(ctx: CanvasRenderingContext2D, grid: Tile[][]) {
             tileSize, tileSize
         )
       } else {
-        console.log('else')
         // fallback couleur
         ctx.fillStyle = getTileColor(tile)
         ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize)
@@ -130,15 +204,15 @@ function drawGrid(ctx: CanvasRenderingContext2D, grid: Tile[][]) {
             const factor = getRandomSize(0.5, 1.2)
 
             // Décalage aléatoire pour donner une impression naturelle
-            const offsetX = getRandomOffset(tileSize, factor)
-            const offsetY = getRandomOffset(tileSize, factor)
+            const treeOffsetX = getRandomOffset(tileSize, factor)
+            const treeOffsetY = getRandomOffset(tileSize, factor)
 
             ctx.drawImage(
                 treeImage,
                 sprite.sx, sprite.sy,
                 SPRITE_SIZE, SPRITE_SIZE,  // taille source (pas * factor ici)
-                x * tileSize + offsetX,
-                y * tileSize + offsetY,
+                x * tileSize + treeOffsetX,
+                y * tileSize + treeOffsetY,
                 SPRITE_SIZE * factor,
                 SPRITE_SIZE * factor
             )
@@ -159,6 +233,8 @@ function drawGrid(ctx: CanvasRenderingContext2D, grid: Tile[][]) {
 
   // Une fois tout dessiné, on trace le carré central si besoin
   drawBaseCenterMarker(ctx, grid)
+
+  ctx.restore() // Fin du transform zoom/pan
 }
 
 function getRandomSize(min: number, max: number) {
@@ -179,8 +255,9 @@ function getTileFromMouseEvent(event: MouseEvent): Tile | null {
   if (!canvas) return null
 
   const rect = canvas.getBoundingClientRect()
-  const x = event.clientX - rect.left
-  const y = event.clientY - rect.top
+  // Convertir les coords écran en coords monde (inverse du transform)
+  const x = (event.clientX - rect.left - offsetX.value) / scale.value
+  const y = (event.clientY - rect.top - offsetY.value) / scale.value
 
   const gridX = Math.floor(x / tileSize)
   const gridY = Math.floor(y / tileSize)
@@ -200,6 +277,9 @@ onMounted(() => {
   tileImage.onload = () => {
     drawGrid(ctx, props.grid) // seulement après que l’image soit prête
   }
+
+  canvas.addEventListener('wheel', onWheel, { passive: false })
+  canvas.addEventListener('mousedown', onMouseDown)
 
   canvas.addEventListener('mousemove', (event) => {
     hoveredTile.value = getTileFromMouseEvent(event)
@@ -228,7 +308,7 @@ const selectedTile = ref<Tile | null>(null)
       ref="canvasRef"
       :width="1300"
       :height="800"
-      style="border: 1px solid black;"
+      :style="{ border: '1px solid black', cursor: isPanning ? 'grabbing' : 'default' }"
   />
   <div class="absolute right-2">
     <div v-if="hoveredTile" style="margin-top: 1rem; font-family: monospace;" class="bg-slate-600 text-shadow-slate-200 p-1 rounded">

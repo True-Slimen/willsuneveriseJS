@@ -13,7 +13,8 @@ export function createEmptyGrid(width: number, height: number, type: TileType): 
       walkable: isWalkable(type),
       walked: 0,
       speedFactor: getSpeedFactorForType(type),
-      danger: 0
+      danger: 0,
+      isBaseCenter: false
     }))
   )
 }
